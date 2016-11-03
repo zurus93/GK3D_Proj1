@@ -141,22 +141,24 @@ public class Scene {
 	}
 	
 	public void drawBench(GL2 gl, ObjLoader bench) {
+		gl.glPushMatrix();
+
 		material(gl, 0.6f, 0.3f, 0);
 		gl.glScaled(0.75, 0.75, 0.75);
-		
-		gl.glTranslated((mWorldX + mWorldWidth) / 2, (mWorldY + mWorldHeight) / 2, (mWorldZ + mWorldDepth)/2);
+		gl.glTranslated((mWorldX + mWorldWidth) / 2, mPeronHeight, (mWorldZ + mWorldDepth)/2);
 		gl.glRotated(90, 0, 1, 0);	
 		bench.drawModel(gl);
 		
 		gl.glTranslated(-1000, 00, 0);
 		
 		bench.drawModel(gl);
+		gl.glPopMatrix();
 	}
 	
-	public void drawBulb(GL2 gl) {		
+	public void drawBulb(GL2 gl) {
 	    gl.glPushMatrix();
         material(gl, 1f, 1f, 0f);
-        gl.glTranslatef((mWorldX + mWorldWidth) / 2, (mWorldY + mWorldHeight)-50, (mWorldZ + mWorldDepth)/2);
+        gl.glTranslatef((mWorldX + mWorldWidth) / 2, mWorldY + mWorldHeight - 100, (mWorldZ + mWorldDepth)/2);
         GLUquadric q=mGlu.gluNewQuadric();
         mGlu.gluSphere(q, 200f,20,20);
         mGlu.gluDeleteQuadric(q);
@@ -172,16 +174,14 @@ public class Scene {
 	}
 	
 	public Vector3D initialLightPosition() {
-		return new Vector3D((mWorldX + mWorldWidth)/2, mWorldY+mWorldHeight-100, (mWorldZ + mWorldDepth)/2);
+		return new Vector3D((mWorldX + mWorldWidth)/2, mWorldY+mWorldHeight, (mWorldZ + mWorldDepth)/2);
 	}
 	
 	private void material(GL2 gl, float r, float g, float b){
 		float[] m = {r, g, b, 1};
 
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, m,0);
-		//gl.glMaterialf(GL.GL_FRONT, GL2.GL_SHININESS, 100.0f);
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_DIFFUSE, m, 0);
 		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT, m, 0);
-		//gl.glMaterialfv(GL.GL_FRONT, GL2.GL_EMISSION, m, 0);
 	}
 }
