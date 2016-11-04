@@ -141,27 +141,59 @@ public class Scene {
 	}
 	
 	public void drawBench(GL2 gl, ObjLoader bench) {
+		//ObjLoader mBench = new ObjLoader("res/Bench/Cgtuts_Wood_Bench_OBJ.obj");
 		gl.glPushMatrix();
 
 		material(gl, 0.6f, 0.3f, 0);
-		gl.glScaled(0.75, 0.75, 0.75);
-		gl.glTranslated((mWorldX + mWorldWidth) / 2, mPeronHeight, (mWorldZ + mWorldDepth)/2);
+		gl.glTranslated((mWorldX + mWorldWidth) / 2, mPeronHeight / 2, (mWorldZ + mWorldDepth)/2);
 		gl.glRotated(90, 0, 1, 0);	
 		bench.drawModel(gl);
 		
-		gl.glTranslated(-1000, 00, 0);
+		gl.glTranslated(-1000, 0, 0);
 		
-		bench.drawModel(gl);
+		bench.drawModel(gl);;
 		gl.glPopMatrix();
+	}
+	
+	public void drawPerson(GL2 gl, ObjLoader person) {
+		gl.glPushMatrix();
+
+		material(gl, 0.8f, 0f, 0.6f);
+		
+		gl.glTranslated((mWorldX + mWorldWidth) / 2 - 100, mPeronHeight / 2, (mWorldZ + mWorldDepth)/2 -200);
+		gl.glScalef(2, 2, 2);
+		person.drawModel(gl);
+
+		gl.glPopMatrix();
+	}
+	
+	public void drawBilboard(GL2 gl, ObjLoader board) {
+		gl.glPushMatrix();
+
+		material(gl, 1f, 1f, 1f);
+		
+		gl.glTranslated(mWorldX + 500, mPeronHeight / 2, (mWorldZ + mWorldDepth)/2-200);
+
+		board.drawModel(gl);
+
+		gl.glPopMatrix();	
 	}
 	
 	public void drawBulb(GL2 gl) {
 	    gl.glPushMatrix();
         material(gl, 1f, 1f, 0f);
-        gl.glTranslatef((mWorldX + mWorldWidth) / 2, mWorldY + mWorldHeight - 100, (mWorldZ + mWorldDepth)/2);
+        gl.glTranslatef((mWorldX + mWorldWidth) / 2, mWorldY + mWorldHeight - 100, (mWorldZ + mWorldDepth)/2 - 1000);
         GLUquadric q=mGlu.gluNewQuadric();
         mGlu.gluSphere(q, 200f,20,20);
         mGlu.gluDeleteQuadric(q);
+	    gl.glPopMatrix(); 
+	    
+	    gl.glPushMatrix();
+        material(gl, 1f, 1f, 0f);
+        gl.glTranslatef((mWorldX + mWorldWidth) / 2, mWorldY + mWorldHeight - 100, (mWorldZ + mWorldDepth)/2 + 1000);
+        GLUquadric q2=mGlu.gluNewQuadric();
+        mGlu.gluSphere(q2, 200f,20,20);
+        mGlu.gluDeleteQuadric(q2);
 	    gl.glPopMatrix(); 
 	}
 	
@@ -173,8 +205,12 @@ public class Scene {
 		return new Vector3D((mWorldX + mWorldWidth)/2, (mWorldY+mWorldHeight)/2, (mWorldZ + mWorldDepth)/2);
 	}
 	
-	public Vector3D initialLightPosition() {
-		return new Vector3D((mWorldX + mWorldWidth)/2, mWorldY+mWorldHeight, (mWorldZ + mWorldDepth)/2);
+	public Vector3D initialLightPosition1() {
+		return new Vector3D((mWorldX + mWorldWidth) / 2, mWorldY + mWorldHeight - 100, (mWorldZ + mWorldDepth)/2 - 1000);
+	}
+	
+	public Vector3D initialLightPosition2() {
+		return new Vector3D((mWorldX + mWorldWidth) / 2, mWorldY + mWorldHeight - 100, (mWorldZ + mWorldDepth)/2 + 1000);
 	}
 	
 	private void material(GL2 gl, float r, float g, float b){

@@ -1,10 +1,12 @@
 import java.awt.BorderLayout;
+
 import javax.swing.JFrame;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 
 public class MetroStationModel implements GLEventListener {
@@ -14,22 +16,28 @@ public class MetroStationModel implements GLEventListener {
 	private static GL2 mGl;
 	
 	private ObjLoader mBench;
+	private ObjLoader mPerson;
+	private ObjLoader mBilboard;
 	
 	private Scene mScene;
 	private CameraMovement mCamera;
 	private Lights mLights;
 
 	private Vector3D mCameraPos;
-	private Vector3D mLightPos;
+	private Vector3D mLightPos1;
+	private Vector3D mLightPos2;
 
 	public MetroStationModel() {		
 		mScene = new Scene();
 		mCamera = new CameraMovement();
 		mLights = new Lights();
 		mCameraPos = mScene.initialCameraPosition();
-		mLightPos = mScene.initialLightPosition();
+		mLightPos1 = mScene.initialLightPosition1();
+		mLightPos2 = mScene.initialLightPosition2();
 		
 		mBench = new ObjLoader("res/Bench/Cgtuts_Wood_Bench_OBJ.obj");
+		mPerson = new ObjLoader("res/SYLT_Business_Wom-06_lowpoly_max.obj");
+		mBilboard = new ObjLoader("res//Tank/TANK.obj");
 		
 		mCanvas.addGLEventListener(this);
 		
@@ -80,9 +88,12 @@ public class MetroStationModel implements GLEventListener {
 
 	public void display(GLAutoDrawable drawable){
 		mGl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		mGl.glMatrixMode(GL2.GL_MODELVIEW);
+		mGl.glLoadIdentity();
+		
+		mLights.setPointLightsPosition(mGl, mLightPos1, mLightPos2);
 		
 		mCameraPos = mCamera.performStep(mCameraPos);
-		mLights.setLightPosition(mGl, mLightPos);
 		displayFromCamera(drawable);
 	}
 
@@ -106,7 +117,9 @@ public class MetroStationModel implements GLEventListener {
 		mScene.drawStage(mGl, drawable);
 		mScene.drawPeron(mGl, drawable);
 		mScene.drawBench(mGl, mBench);
-		//mScene.drawBulb(mGl);
+		mScene.drawBulb(mGl);
+		mScene.drawPerson(mGl, mPerson);
+		mScene.drawBilboard(mGl, mBilboard);
 	}
 
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {

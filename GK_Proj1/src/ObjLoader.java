@@ -146,17 +146,29 @@ public class ObjLoader {
         //if a value of zero is found that it tells us we don't have that type of data
         if ((tv[0] != 0) && (tt[0] != 0) && (tn[0] != 0)) {
             ConstructTNV(); //we have vertex, 2D texture, and normal Data
-            inGL.glInterleavedArrays(GL2.GL_T2F_N3F_V3F, 0, modeldata);
         } else if ((tv[0] != 0) && (tt[0] != 0) && (tn[0] == 0)) {
             ConstructTV(); //we have just vertex and 2D texture Data
-            inGL.glInterleavedArrays(GL2.GL_T2F_V3F, 0, modeldata);
         } else if ((tv[0] != 0) && (tt[0] == 0) && (tn[0] != 0)) {
             ConstructNV(); //we have just vertex and normal Data
-            inGL.glInterleavedArrays(GL2.GL_N3F_V3F, 0, modeldata);
         } else if ((tv[0] != 0) && (tt[0] == 0) && (tn[0] == 0)) {
             ConstructV();
-            inGL.glInterleavedArrays(GL2.GL_V3F, 0, modeldata);
         }
+    }
+    
+    private void initGlData(GL2 inGL) {
+        final int tv[] = (int[]) fv.get(0);
+        final int tt[] = (int[]) ft.get(0);
+        final int tn[] = (int[]) fn.get(0);
+        //if a value of zero is found that it tells us we don't have that type of data
+        if ((tv[0] != 0) && (tt[0] != 0) && (tn[0] != 0)) {
+            inGL.glInterleavedArrays(GL2.GL_T2F_N3F_V3F, 0, modeldata);
+        } else if ((tv[0] != 0) && (tt[0] != 0) && (tn[0] == 0)) {
+            inGL.glInterleavedArrays(GL2.GL_T2F_V3F, 0, modeldata);
+        } else if ((tv[0] != 0) && (tt[0] == 0) && (tn[0] != 0)) {
+            inGL.glInterleavedArrays(GL2.GL_N3F_V3F, 0, modeldata);
+        } else if ((tv[0] != 0) && (tt[0] == 0) && (tn[0] == 0)) {
+            inGL.glInterleavedArrays(GL2.GL_V3F, 0, modeldata);
+        }   	
     }
 
     private void ConstructTNV() {
@@ -261,6 +273,7 @@ public class ObjLoader {
             cleanup();
             init = false;
         }
+        initGlData(inGL);
         inGL.glDrawArrays(FaceFormat, 0, PolyCount * FaceMultiplier);
     }
 
@@ -268,9 +281,6 @@ public class ObjLoader {
         vData.clear();
         vtData.clear();
         vnData.clear();
-        fv.clear();
-        ft.clear();
-        fn.clear();
         modeldata.clear();
     }
 

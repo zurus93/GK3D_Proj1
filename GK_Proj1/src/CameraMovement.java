@@ -14,6 +14,8 @@ public class CameraMovement
 	private boolean mSPressed = false;
 	private boolean mAPressed = false;
 	private boolean mDPressed = false;
+	private boolean oPressed = false;
+	private boolean pPressed = false;
 
 	private double mSpeed = 10;
 
@@ -103,6 +105,22 @@ public class CameraMovement
 			cameraPos = cameraPos.add(new Vector3D(newPosX, newPosY, newPosZ));			
 		}
 		
+		if (oPressed) {
+			double newPosX = 0;
+			double newPosY = mSpeed * Math.cos(Math.toRadians(mPitchAngle));
+			double newPosZ = 0;
+
+			cameraPos = cameraPos.add(new Vector3D(-newPosX, newPosY, newPosZ));			
+		}
+		
+		if (pPressed) {
+			double newPosX = 0;
+			double newPosY = mSpeed;
+			double newPosZ = 0;
+			
+			cameraPos = cameraPos.add(new Vector3D(-newPosX, -newPosY, -newPosZ));			
+		}
+		
 		return cameraPos;
 	}
 	
@@ -133,25 +151,24 @@ public class CameraMovement
 
 			if(e.getKeyCode() == KeyEvent.VK_UP){
 				mUpPressed = false;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_DOWN){
+			} else if(e.getKeyCode() == KeyEvent.VK_DOWN){
 				mDownPressed = false;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_LEFT){
+			} else if(e.getKeyCode() == KeyEvent.VK_LEFT){
 				mLeftPressed = false;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_RIGHT){
+			} else if(e.getKeyCode() == KeyEvent.VK_RIGHT){
 				mRightPressed = false;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_W){
+			} else if(e.getKeyCode() == KeyEvent.VK_W){
 				mWPressed = false;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_S){
+			} else if(e.getKeyCode() == KeyEvent.VK_S){
 				mSPressed = false;
 			} else if (e.getKeyCode() == KeyEvent.VK_A) {
 				mAPressed = false;
 			} else if (e.getKeyCode() == KeyEvent.VK_D) {
 				mDPressed = false;
+			} else if (e.getKeyCode() == KeyEvent.VK_O) {
+				oPressed = false;
+			} else if (e.getKeyCode() == KeyEvent.VK_P) {
+				pPressed = false;
 			}
 		}
 
@@ -159,25 +176,24 @@ public class CameraMovement
 		public void keyPressed(KeyEvent e) {
 			if(e.getKeyCode() == KeyEvent.VK_UP){
 				mUpPressed = true;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_DOWN){
+			} else if(e.getKeyCode() == KeyEvent.VK_DOWN){
 				mDownPressed = true;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_LEFT){
+			} else if(e.getKeyCode() == KeyEvent.VK_LEFT){
 				mLeftPressed = true;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_RIGHT){
+			} else if(e.getKeyCode() == KeyEvent.VK_RIGHT){
 				mRightPressed = true;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_W){
+			} else if(e.getKeyCode() == KeyEvent.VK_W){
 				mWPressed = true;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_S){
+			} else if(e.getKeyCode() == KeyEvent.VK_S){
 				mSPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_A) {
 				mAPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_D) {
 				mDPressed = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_O) {
+				oPressed = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_P) {
+				pPressed = true;
 			}
 		}
 	}
