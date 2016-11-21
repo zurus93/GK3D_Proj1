@@ -98,26 +98,41 @@ public class Scene {
 		double w = mPeronWidth / 10;
 		double h = mPeronHeight / 10;
 		double d = mWorldHeight / 10;
-		
+
 		for (double x = mWorldX; x < mWorldX + mPeronWidth; x += w) {
 			for (double z = mWorldZ; z < mWorldZ + mWorldDepth; z += d) {
 				gl.glBegin(GL2.GL_POLYGON);
 
-				material(gl, 0, 0, 0);
 				gl.glNormal3d(0, 1, 0);
+				
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 0, 0);
+				if (x == mWorldX + mPeronWidth - w) 
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 0, 0);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z);
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 1, 0);
+				if (x == mWorldX + mPeronWidth - w) 
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 1, 0);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z+d);
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 1, 1);
+				if (x == mWorldX + mPeronWidth - w) 
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 1, 1);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z+d);
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 0, 1);
+				if (x == mWorldX + mPeronWidth - w) 
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 0, 1);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z);
 				gl.glEnd();
 				
 				gl.glBegin(GL2.GL_POLYGON);
 
-				material(gl, 0, 0, 0);
 				gl.glNormal3d(0, -1, 0);
+				gl.glTexCoord2f(0.0f, 1.0f);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z+d);
+				gl.glTexCoord2f(0.0f, 0.0f);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z);
+				gl.glTexCoord2f(1.0f, 0.0f);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z);
+				gl.glTexCoord2f(1.0f, 1.0f);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z+d);
 				gl.glEnd();														
 			}
@@ -127,7 +142,7 @@ public class Scene {
 			for (double z = mWorldZ; z < mWorldZ + mWorldDepth; z += d) {
 				gl.glBegin(GL2.GL_POLYGON);
 
-				material(gl, 1f, 1f, 1f);
+				material(gl, 0f, 0f, 0f);
 				
 				gl.glNormal3d(1, 0, 0);
 				gl.glVertex3d(mWorldX + mPeronWidth, y, z+d);
@@ -137,7 +152,7 @@ public class Scene {
 										
 				gl.glEnd();					
 			}
-		}		
+		}
 	}
 	
 	public void drawBench(GL2 gl, ObjLoader bench) {
