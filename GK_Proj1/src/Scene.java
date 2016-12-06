@@ -25,21 +25,28 @@ public class Scene {
 			for (double y = mWorldY; y < mWorldY + mWorldHeight; y += h) {
 				gl.glBegin(GL2.GL_POLYGON);
 	
-				material(gl, 0, 1f, 0);
 				gl.glNormal3d(0, 0, -1);
+				gl.glTexCoord3d(-1, 1, 1);
 				gl.glVertex3d(x, (y + h), (mWorldZ + mWorldDepth));
+				gl.glTexCoord3d(1, 1, 1);
 				gl.glVertex3d((x + w), (y + h), (mWorldZ + mWorldDepth));
-				gl.glVertex3d((x + w), y, (mWorldZ + mWorldDepth));				
+				gl.glTexCoord3d(1, -1, 1);
+				gl.glVertex3d((x + w), y, (mWorldZ + mWorldDepth));	
+				gl.glTexCoord3d(-1, -1, 1);
 				gl.glVertex3d(x, y, (mWorldZ + mWorldDepth));
 				gl.glEnd();						
 				
 				gl.glBegin(GL2.GL_POLYGON);
 	
-				material(gl, 0, 1f, 0);
+				//material(gl, 0, 1f, 0);
 				gl.glNormal3d(0, 0, 1);
+				gl.glTexCoord3d(1, 1, -1);
 				gl.glVertex3d(x + w, y + h, mWorldZ);
+				gl.glTexCoord3d(-1, 1, -1);
 				gl.glVertex3d(x, y+h, mWorldZ);
-				gl.glVertex3d(x, y, mWorldZ);				
+				gl.glTexCoord3d(-1, -1, -1);
+				gl.glVertex3d(x, y, mWorldZ);
+				gl.glTexCoord3d(1, -1, -1);
 				gl.glVertex3d(x+w, y, mWorldZ);
 				gl.glEnd();					
 			}
@@ -48,21 +55,29 @@ public class Scene {
 		for (double y = mWorldY; y < mWorldY + mWorldHeight; y += h) {
 			for (double z = mWorldZ; z < mWorldZ + mWorldDepth; z += d) {
 				gl.glBegin(GL2.GL_POLYGON);
-				material(gl, 0, 0, 1f);
-				gl.glNormal3d(1, 0, 0);				
+				//material(gl, 0, 0, 1f);
+				gl.glNormal3d(1, 0, 0);
+				gl.glTexCoord3d(-1, -1, 1);
 				gl.glVertex3d(mWorldX, y, z+d);
+				gl.glTexCoord3d(-1, -1, -1);
 				gl.glVertex3d(mWorldX, y, z);
+				gl.glTexCoord3d(-1, 1, -1);
 				gl.glVertex3d(mWorldX, y+h, z);
+				gl.glTexCoord3d(-1, 1, 1);
 				gl.glVertex3d(mWorldX, y+h, z+d);
 	
 				gl.glEnd();
 				
 				gl.glBegin(GL2.GL_POLYGON);
-				material(gl, 0, 0, 1f);
-				gl.glNormal3d(-1, 0, 0);				
+				//material(gl, 0, 0, 1f);
+				gl.glNormal3d(-1, 0, 0);
+				gl.glTexCoord3d(1, -1, -1);
 				gl.glVertex3d(mWorldX+mWorldWidth, y, z);
+				gl.glTexCoord3d(1, -1, 1);
 				gl.glVertex3d(mWorldX+mWorldWidth, y, z+d);
+				gl.glTexCoord3d(1, 1, 1);
 				gl.glVertex3d(mWorldX+mWorldWidth, y+h, z+d);
+				gl.glTexCoord3d(1, 1, -1);
 				gl.glVertex3d(mWorldX+mWorldWidth, y+h, z);
 	
 				gl.glEnd();				
@@ -72,21 +87,29 @@ public class Scene {
 		for (double x = mWorldX; x < mWorldX + mWorldWidth; x += w) {
 			for (double z = mWorldZ; z < mWorldZ + mWorldDepth; z += d) {
 				gl.glBegin(GL2.GL_POLYGON);
-				material(gl, 1f, 0, 0);
-				gl.glNormal3d(0, -1, 0);				
+				//material(gl, 1f, 0, 0);
+				gl.glNormal3d(0, -1, 0);	
+				gl.glTexCoord3d(-1, 1, 1);
 				gl.glVertex3d(x, mWorldY+mWorldHeight, z+d);
+				gl.glTexCoord3d(-1, 1, -1);
 				gl.glVertex3d(x, mWorldY+mWorldHeight, z);
+				gl.glTexCoord3d(1, 1, -1);
 				gl.glVertex3d(x+w, mWorldY+mWorldHeight, z);
+				gl.glTexCoord3d(1, 1, 1);
 				gl.glVertex3d(x+w, mWorldY+mWorldHeight, z+d);
 	
 				gl.glEnd();
 				
 				gl.glBegin(GL2.GL_POLYGON);
-				material(gl, 1f, 0, 0);
-				gl.glNormal3d(0, 1, 0);				
+				//material(gl, 1f, 0, 0);
+				gl.glNormal3d(0, 1, 0);
+				gl.glTexCoord3d(-1, -1, -1);
 				gl.glVertex3d(x, mWorldY, z);
+				gl.glTexCoord3d(-1, -1, 1);
 				gl.glVertex3d(x, mWorldY, z+d);
+				gl.glTexCoord3d(1, -1, 1);
 				gl.glVertex3d(x+w, mWorldY, z+d);
+				gl.glTexCoord3d(1, -1, -1);
 				gl.glVertex3d(x+w, mWorldY, z);
 	
 				gl.glEnd();					
@@ -105,34 +128,34 @@ public class Scene {
 
 				gl.glNormal3d(0, 1, 0);
 				
-				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 0, 0);
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 0, 0);
 				if (x == mWorldX + mPeronWidth - w) 
-					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 0, 0);
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE2, 0, 0);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z);
-				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 1, 0);
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 0, 1);
 				if (x == mWorldX + mPeronWidth - w) 
-					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 1, 0);
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE2, 0, 1);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z+d);
-				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 1, 1);
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 1, 1);
 				if (x == mWorldX + mPeronWidth - w) 
-					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 1, 1);
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE2, 1, 1);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z+d);
-				gl.glMultiTexCoord2d(GL2.GL_TEXTURE0, 0, 1);
+				gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 1, 0);
 				if (x == mWorldX + mPeronWidth - w) 
-					gl.glMultiTexCoord2d(GL2.GL_TEXTURE1, 0, 1);
+					gl.glMultiTexCoord2d(GL2.GL_TEXTURE2, 1, 0);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z);
 				gl.glEnd();
 				
 				gl.glBegin(GL2.GL_POLYGON);
 
 				gl.glNormal3d(0, -1, 0);
-				gl.glTexCoord2f(0.0f, 1.0f);
+				gl.glTexCoord3f(GL2.GL_TEXTURE1, 0, 1.0f);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z+d);
-				gl.glTexCoord2f(0.0f, 0.0f);
+				gl.glTexCoord3f(GL2.GL_TEXTURE1, 0, 0);
 				gl.glVertex3d(x, mWorldY+mPeronHeight, z);
-				gl.glTexCoord2f(1.0f, 0.0f);
+				gl.glTexCoord3f(GL2.GL_TEXTURE1, 1, 0);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z);
-				gl.glTexCoord2f(1.0f, 1.0f);
+				gl.glTexCoord3f(GL2.GL_TEXTURE1, 1, 1);
 				gl.glVertex3d(x+w, mWorldY+mPeronHeight, z+d);
 				gl.glEnd();														
 			}

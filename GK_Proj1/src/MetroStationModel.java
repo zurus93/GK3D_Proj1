@@ -7,12 +7,16 @@ import java.nio.FloatBuffer;
 
 import javax.swing.JFrame;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -37,6 +41,7 @@ public class MetroStationModel implements GLEventListener {
 	
 	private Texture mMarmurTexture;
 	private Texture mYellowStraw;
+	private Texture mWallsTexture;
 
 	public MetroStationModel() {		
 		mScene = new Scene();
@@ -75,10 +80,16 @@ public class MetroStationModel implements GLEventListener {
 		mGl = (GL2) mCanvas.getGL();
 		
 		mLights.prepareLights(mGl);
+		GLCapabilities caps;
+		caps = new GLCapabilities(GLProfile.getDefault());
+		caps.setSampleBuffers(true);
+		caps.setNumSamples(4);
         
         // Load texture.
         try {
-            InputStream stream = MetroStationModel.class.getResourceAsStream("marmur.jpg");
+        	mWallsTexture = Cubemap.loadFromStreams(mGl, MetroStationModel.class, "walls", "jpg", false);
+        	
+            InputStream stream = MetroStationModel.class.getResourceAsStream("wood.jpg");
             TextureData data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "jpg");
             mMarmurTexture = TextureIO.newTexture(data);
             
@@ -91,10 +102,15 @@ public class MetroStationModel implements GLEventListener {
             System.exit(1);
         }
         
+        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST); 
+        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_R, GL2.GL_REPEAT);
+        
         mMarmurTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
         mMarmurTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-        
-        
+               
         mYellowStraw.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_BORDER); 
         mYellowStraw.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_BORDER);
         float color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -118,9 +134,17 @@ public class MetroStationModel implements GLEventListener {
 		mGl.glEnable(GL2.GL_DEPTH_TEST);
 		
 		mGl.glMatrixMode(GL2.GL_MODELVIEW);
-		
+
 		mGl.glEnable(GL2.GL_NORMALIZE);		
 
+	    mGl.glEnable(GL2.GL_LINE_SMOOTH);      
+	    mGl.glEnable(GL2.GL_POLYGON_SMOOTH);
+	    mGl.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
+	    mGl.glEnable(GL2.GL_MULTISAMPLE);
+	    
+	    mGl.glEnable(GL2.GL_BLEND);
+	    mGl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+	    
 		mGl.glLoadIdentity();
 		mGl.glFrustum(-1, 1, -1, 1, 1, mScene.getWorldDepth());
 		mGl.glViewport(0, 0, width, height);
@@ -141,6 +165,7 @@ public class MetroStationModel implements GLEventListener {
 	}
 
 	public void displayFromCamera(GLAutoDrawable drawable) {
+		mGl.glEnable(GL2.GL_MULTISAMPLE);
 		mGl.glPushMatrix();
 
 		mGl.glLoadIdentity();
@@ -154,32 +179,38 @@ public class MetroStationModel implements GLEventListener {
 		displayWholeScene(drawable);
 
 		mGl.glPopMatrix();
+		mGl.glDisable(GL2.GL_MULTISAMPLE);
 	}
 
 	public void displayWholeScene(GLAutoDrawable drawable) {
-		mScene.drawStage(mGl, drawable);
-		
         // Set material properties.
         float[] rgba = {1f, 1f, 1f};
         mGl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT, rgba, 0);
         mGl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, rgba, 0);
         mGl.glMaterialf(GL2.GL_FRONT, GL2.GL_SHININESS, 0.5f);
 
-        // Apply texture.
         mGl.glActiveTexture(GL2.GL_TEXTURE0);
+        mWallsTexture.bind(mGl);
+        mWallsTexture.enable(mGl);
+		mScene.drawStage(mGl, drawable);
+		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+		mWallsTexture.disable(mGl);
+
+        // Apply texture.
+        mGl.glActiveTexture(GL2.GL_TEXTURE1);
         mMarmurTexture.enable(mGl);
         mMarmurTexture.bind(mGl);
         
-        mGl.glActiveTexture(GL2.GL_TEXTURE1);
+        mGl.glActiveTexture(GL2.GL_TEXTURE2);
         mYellowStraw.enable(mGl);
         mYellowStraw.bind(mGl);
         
 		mScene.drawPeron(mGl, drawable);
-		
-		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+
+		mGl.glActiveTexture(GL2.GL_TEXTURE1);
 		mMarmurTexture.disable(mGl);
 		
-		mGl.glActiveTexture(GL2.GL_TEXTURE1);
+		mGl.glActiveTexture(GL2.GL_TEXTURE2);
 		mYellowStraw.disable(mGl);
 		
 		mScene.drawBench(mGl, mBench);
