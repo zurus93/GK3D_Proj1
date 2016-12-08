@@ -170,10 +170,21 @@ public class MetroStationModel implements GLEventListener {
 		mGl.glLoadIdentity();
 		mGl.glFrustum(-1, 1, -1, 1, 1, mScene.getWorldDepth());
 		mGl.glViewport(0, 0, width, height);
-         
-		mGl.glClearColor(.25f, .25f, .25f, 1f);
-		
+						
         mGl.glShadeModel(GL2.GL_SMOOTH);               // Enables Smooth Color Shading
+
+        mGl.glEnable(GL2.GL_FOG);
+        {
+          float fogColor[] =
+          { 0.5f, 0.5f, 0.5f, 0.1f };
+     
+          mGl.glFogi(GL2.GL_FOG_MODE, GL2.GL_EXP);
+          mGl.glFogfv(GL2.GL_FOG_COLOR, fogColor, 0);
+          mGl.glFogf(GL2.GL_FOG_DENSITY, 0.0005f);
+          mGl.glHint(GL2.GL_FOG_HINT, GL2.GL_NICEST);
+        }
+        
+        mGl.glClearColor(.25f, .25f, .25f, 1f);
 	}
 
 
