@@ -29,7 +29,7 @@ public class MetroStationModel implements GLEventListener {
 	
 	private ObjLoader mBench;
 	private ObjLoader mPerson;
-	private ObjLoader mBilboard;
+	private ObjLoader mTank;
 	
 	private Scene mScene;
 	private CameraMovement mCamera;
@@ -42,6 +42,10 @@ public class MetroStationModel implements GLEventListener {
 	private Texture mMarmurTexture;
 	private Texture mYellowStraw;
 	private Texture mWallsTexture;
+	private Texture mBilboardTexture;
+	private Texture mParticuleTexture;
+	
+	private ParticleEffect mParticleEffect;
 
 	public MetroStationModel() {		
 		mScene = new Scene();
@@ -50,10 +54,11 @@ public class MetroStationModel implements GLEventListener {
 		mCameraPos = mScene.initialCameraPosition();
 		mLightPos1 = mScene.initialLightPosition1();
 		mLightPos2 = mScene.initialLightPosition2();
+		mParticleEffect = new ParticleEffect();
 		
 		mBench = new ObjLoader("res/Bench/Cgtuts_Wood_Bench_OBJ.obj");
 		mPerson = new ObjLoader("res/SYLT_Business_Wom-06_lowpoly_max.obj");
-		mBilboard = new ObjLoader("res/Tank/TANK.obj");
+		mTank = new ObjLoader("res/Tank/TANK.obj");
 		
 		mCanvas.addGLEventListener(this);
 		
@@ -96,14 +101,22 @@ public class MetroStationModel implements GLEventListener {
             stream = MetroStationModel.class.getResourceAsStream("yellow_straw.jpg");
             data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "jpg");
             mYellowStraw = TextureIO.newTexture(data);
+            
+            stream = MetroStationModel.class.getResourceAsStream("ball.png");
+            data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "png");
+            mBilboardTexture = TextureIO.newTexture(data);
+            
+			stream = MetroStationModel.class.getResourceAsStream("smoke.png");
+			data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "png");
+			mParticuleTexture = TextureIO.newTexture(data);
         }
         catch (IOException exc) {
             exc.printStackTrace();
             System.exit(1);
         }
         
-        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST); 
-        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
+        mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
         mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
         mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
         mWallsTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_R, GL2.GL_REPEAT);
@@ -123,6 +136,15 @@ public class MetroStationModel implements GLEventListener {
         mYellowStraw.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
         mYellowStraw.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
         
+        mBilboardTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
+        mBilboardTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        mBilboardTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+        mBilboardTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+        
+        mParticuleTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST); 
+        mParticuleTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+        
+        mParticleEffect.init();
 	}
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -149,7 +171,9 @@ public class MetroStationModel implements GLEventListener {
 		mGl.glFrustum(-1, 1, -1, 1, 1, mScene.getWorldDepth());
 		mGl.glViewport(0, 0, width, height);
          
-		mGl.glClearColor(.25f, .25f, .25f, 1f);	
+		mGl.glClearColor(.25f, .25f, .25f, 1f);
+		
+        mGl.glShadeModel(GL2.GL_SMOOTH);               // Enables Smooth Color Shading
 	}
 
 
@@ -184,11 +208,6 @@ public class MetroStationModel implements GLEventListener {
 
 	public void displayWholeScene(GLAutoDrawable drawable) {
         // Set material properties.
-        float[] rgba = {1f, 1f, 1f};
-        mGl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT, rgba, 0);
-        mGl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, rgba, 0);
-        mGl.glMaterialf(GL2.GL_FRONT, GL2.GL_SHININESS, 0.5f);
-
         mGl.glActiveTexture(GL2.GL_TEXTURE0);
         mWallsTexture.bind(mGl);
         mWallsTexture.enable(mGl);
@@ -212,11 +231,27 @@ public class MetroStationModel implements GLEventListener {
 		
 		mGl.glActiveTexture(GL2.GL_TEXTURE2);
 		mYellowStraw.disable(mGl);
-		
+
 		mScene.drawBench(mGl, mBench);
 		mScene.drawBulb(mGl);
 		mScene.drawPerson(mGl, mPerson);
-		mScene.drawBilboard(mGl, mBilboard);
+		mScene.drawTank(mGl, mTank);
+        
+        mGl.glActiveTexture(GL2.GL_TEXTURE0);
+        mBilboardTexture.enable(mGl);
+        mBilboardTexture.bind(mGl);
+		mScene.drawBilboard(mGl, (float) mCamera.getRollAngle(), (float) mCamera.getPitchAngle());
+		
+		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+		mBilboardTexture.disable(mGl);
+		
+		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+        mParticuleTexture.enable(mGl);
+        mParticuleTexture.bind(mGl);
+		mParticleEffect.display(mGl, (float) mCamera.getRollAngle(), (float) mCamera.getPitchAngle());
+		
+		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+		mParticuleTexture.disable(mGl);
 	}
 
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {

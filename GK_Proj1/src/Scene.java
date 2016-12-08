@@ -4,15 +4,15 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 
 public class Scene {
-	private final int mWorldX = -400;
-	private final int mWorldY = -400;
-	private final int mWorldWidth = 3500;
-	private final int mWorldHeight = 2500;
-	private final int mWorldZ = 100;
-	private final int mWorldDepth = 4800;
+	private static final int mWorldX = -400;
+	private static final int mWorldY = -400;
+	private static final int mWorldWidth = 3500;
+	private static final int mWorldHeight = 2500;
+	private static final int mWorldZ = 100;
+	private static final int mWorldDepth = 4800;
 	
-	private final int mPeronHeight = 800;
-	private final int mPeronWidth = 2500;
+	private static final int mPeronHeight = 800;
+	private static final int mPeronWidth = 2500;
 	
 	private GLU mGlu = new GLU();
 	
@@ -205,7 +205,7 @@ public class Scene {
 		gl.glPopMatrix();
 	}
 	
-	public void drawBilboard(GL2 gl, ObjLoader board) {
+	public void drawTank(GL2 gl, ObjLoader board) {
 		gl.glPushMatrix();
 
 		material(gl, 1f, 1f, 1f);
@@ -215,6 +215,38 @@ public class Scene {
 		board.drawModel(gl);
 
 		gl.glPopMatrix();	
+	}
+	
+	public void drawBilboard(GL2 gl, float rotate_x, float rotate_y) {		
+		int xInterval = 100;
+		int zInterval = 200;
+		for (int i = 1; i <= 2; ++i) {
+			for (int z = zInterval; z < mWorldDepth - zInterval; z += zInterval) {
+
+				gl.glPushMatrix();
+				gl.glTranslated(mWorldX + mPeronWidth - i * xInterval, mPeronHeight / 2, mWorldZ + z);
+				gl.glRotatef (rotate_x, 0, -1, 0);
+				gl.glRotatef (rotate_y, -1, 0, 0);
+				  
+				float[] u = {50f, 0, 0};
+				float[] v = {0, 50f, 0};
+				
+				
+				gl.glBegin (GL2.GL_QUADS);
+				
+				gl.glTexCoord2f(0, 0); 
+				gl.glVertex3f ( u[0] + v[0],  u[1] + v[1],  u[2] + v[2]);
+				gl.glTexCoord2f(1, 0);
+				gl.glVertex3f (-u[0] + v[0], -u[1] + v[1], -u[2] + v[2]);
+				gl.glTexCoord2f(1, 1); 
+				gl.glVertex3f (-u[0] - v[0], -u[1] - v[1], -u[2] - v[2]);
+				gl.glTexCoord2f(0, 1); 
+				gl.glVertex3f ( u[0] - v[0],  u[1] - v[1],  u[2] - v[2]);
+				gl.glEnd ();
+				
+				gl.glPopMatrix();
+			}
+		}	
 	}
 	
 	public void drawBulb(GL2 gl) {
@@ -235,10 +267,6 @@ public class Scene {
 	    gl.glPopMatrix(); 
 	}
 	
-	public int getWorldDepth() {
-		return mWorldZ + mWorldDepth + 10;
-	}
-	
 	public Vector3D initialCameraPosition() {
 		return new Vector3D((mWorldX + mWorldWidth)/2, (mWorldY+mWorldHeight)/2, (mWorldZ + mWorldDepth)/2);
 	}
@@ -249,6 +277,46 @@ public class Scene {
 	
 	public Vector3D initialLightPosition2() {
 		return new Vector3D((mWorldX + mWorldWidth) / 2, mWorldY + mWorldHeight - 100, (mWorldZ + mWorldDepth)/2 + 1000);
+	}
+	
+	public static int getWorldX()
+	{
+		return mWorldX;
+	}
+
+	public static int getWorldY()
+	{
+		return mWorldY;
+	}
+
+	public static int getWorldWidth()
+	{
+		return mWorldWidth;
+	}
+
+	public static int getWorldHeight()
+	{
+		return mWorldHeight;
+	}
+
+	public static int getWorldZ()
+	{
+		return mWorldZ;
+	}
+
+	public static int getWorldDepth()
+	{
+		return mWorldDepth;
+	}
+
+	public static int getPeronHeight()
+	{
+		return mPeronHeight;
+	}
+
+	public static int getPeronWidth()
+	{
+		return mPeronWidth;
 	}
 	
 	private void material(GL2 gl, float r, float g, float b){
