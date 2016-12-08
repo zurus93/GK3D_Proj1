@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.jogamp.opengl.GL2;
 
 
@@ -5,7 +9,7 @@ public class ParticleEffect
 {
 	private static final int MAX_PARTICLES = 100;
 	
-    private Particle[] particles = new Particle[MAX_PARTICLES];
+    private List<Particle> particles = new ArrayList<Particle>(MAX_PARTICLES);
     
     private float colors[][] =
             {
@@ -32,50 +36,54 @@ public class ParticleEffect
     public void init() { 
         for (int loop = 0; loop < MAX_PARTICLES; loop++)  // Initials All The Textures
         {
-            particles[loop] = new Particle();
-            particles[loop].active = true;  // Make All The Particles Active
-            particles[loop].life = 1.0f;  // Give All The Particles Full Life
+        	Particle particle = new Particle();
+            particle.active = true;  // Make All The Particles Active
+            particle.life = 1.0f;  // Give All The Particles Full Life
              
             // Random Fade Speed
-            particles[loop].fade = (float) (100 * Math.random()) / 1000.0f + 0.003f;  
+            particle.fade = (float) (100 * Math.random()) / 1000.0f + 0.003f;  
              
             // Select Red Rainbow Color
-            particles[loop].r = colors[loop * (12 / MAX_PARTICLES)][0];  
+            particle.r = colors[loop * (12 / MAX_PARTICLES)][0];  
              
             // Select Red Rainbow Color
-            particles[loop].g = colors[loop * (12 / MAX_PARTICLES)][1];  
+            particle.g = colors[loop * (12 / MAX_PARTICLES)][1];  
              
             // Select Red Rainbow Color
-            particles[loop].b = colors[loop * (12 / MAX_PARTICLES)][2];  
+            particle.b = colors[loop * (12 / MAX_PARTICLES)][2];  
              
             // Random Speed On X Axis
-            particles[loop].xi = (float) ((50 * Math.random()) - 26.0f) * 10.0f;    
+            particle.xi = (float) ((50 * Math.random()) - 26.0f) * 10.0f;    
              
             // Random Speed On Y Axis
-            particles[loop].yi = (float) ((50 * Math.random()) - 25.0f) * 10.0f;    
+            particle.yi = (float) ((50 * Math.random()) - 25.0f) * 10.0f;    
              
             // Random Speed On Z Axis
-            particles[loop].zi = (float) ((50 * Math.random()) - 25.0f) * 10.0f;    
-            particles[loop].xg = 0.0f;  // Set Horizontal Pull To Zero
-            particles[loop].yg = 0.8f;  // Set Vertical Pull Downward
-            particles[loop].zg = 0.0f;  // Set Pull On Z Axis To Zero
+            particle.zi = (float) ((50 * Math.random()) - 25.0f) * 10.0f;    
+            particle.xg = 0.0f;  // Set Horizontal Pull To Zero
+            particle.yg = 0.8f;  // Set Vertical Pull Downward
+            particle.zg = 0.0f;  // Set Pull On Z Axis To Zero
+            
+            particle.cameraDistance = -1;
+            
+            particles.add(particle);
         }
     }
 	
-    public void display(GL2 gl, float rotate_x, float rotate_y) {        
+    public void display(GL2 gl, float rotate_x, float rotate_y, Vector3D cameraPosition) {        
         // Loop Through All The Particles
-        for (int loop = 0; loop < MAX_PARTICLES; loop++)  
+        for (Particle particle : particles)  
         {
-            if (particles[loop].active)  // If The Particle Is Active
+            if (particle.active)  // If The Particle Is Active
             {
-                float x = particles[loop].x;  // Grab Our Particle X Position
-                float y = particles[loop].y;  // Grab Our Particle Y Position
-                float z = particles[loop].z + zoomRate;  // Particle Z Pos + Zoom
+                float x = particle.x;  // Grab Our Particle X Position
+                float y = particle.y;  // Grab Our Particle Y Position
+                float z = particle.z + zoomRate;  // Particle Z Pos + Zoom
  
                 // Draw The Particle Using Our RGB Values, Fade The 
                 // Particle Based On It's Life
-                gl.glColor4f(particles[loop].r, particles[loop].g, 
-                        particles[loop].b, particles[loop].life);
+                gl.glColor4f(particle.r, particle.g, 
+                        particle.b, particle.life);
 
 				gl.glPushMatrix();
 				gl.glTranslated(Scene.getWorldX() + 1150, Scene.getPeronHeight() / 2 + 330, (Scene.getWorldZ() + Scene.getWorldDepth())/2-400);
@@ -94,47 +102,51 @@ public class ParticleEffect
                 gl.glPopMatrix();
  
                 // Move On The X Axis By X Speed
-                particles[loop].x += (particles[loop].xi * 10) / (slowdown * 1000);
+                particle.x += (particle.xi * 10) / (slowdown * 1000);
                  
                 // Move On The Y Axis By Y Speed
-                particles[loop].y += (particles[loop].yi * 10) / (slowdown * 1000);
+                particle.y += (particle.yi * 10) / (slowdown * 1000);
                  
                 // Move On The Z Axis By Z Speed
-                particles[loop].z += (particles[loop].zi * 10) / (slowdown * 1000);
+                particle.z += (particle.zi * 10) / (slowdown * 1000);
  
                 // Take Pull On X Axis Into Account
-                particles[loop].xi += particles[loop].xg;
+                particle.xi += particle.xg;
                  
                 // Take Pull On Y Axis Into Account
-                particles[loop].yi += particles[loop].yg;      
+                particle.yi += particle.yg;      
                  
                 // Take Pull On Z Axis Into Account
-                particles[loop].zi += particles[loop].zg;    
+                particle.zi += particle.zg;    
                  
                 // Reduce Particles Life By 'Fade'
-                particles[loop].life -= particles[loop].fade;    
- 
-                if (particles[loop].life < 0.0f)  // If Particle Is Burned Out
+                particle.life -= particle.fade;
+
+                Vector3D position = new Vector3D(particle.x, particle.y, particle.z);
+                particle.cameraDistance = (position.substract(cameraPosition)).distance();
+                
+                if (particle.life < 0.0f)  // If Particle Is Burned Out
                 {
-                    particles[loop].life = 1.0f;  // Give It New Life
+                    particle.life = 1.0f;  // Give It New Life
+                    particle.cameraDistance = -1;
                      
                     // Random Fade Value
-                    particles[loop].fade = (float) (100 * Math.random()) / 1000.0f + 0.003f;  
-                    particles[loop].x = 0.0f;  // Center On X Axis
-                    particles[loop].y = 0.0f;  // Center On Y Axis
-                    particles[loop].z = 0.0f;  // Center On Z Axis
+                    particle.fade = (float) (100 * Math.random()) / 1000.0f + 0.003f;  
+                    particle.x = 0.0f;  // Center On X Axis
+                    particle.y = 0.0f;  // Center On Y Axis
+                    particle.z = 0.0f;  // Center On Z Axis
                      
                     // X Axis Speed And Direction
-                    particles[loop].xi = xspeed + (float) ((60 * Math.random()) - 32.0f);  
+                    particle.xi = xspeed + (float) ((60 * Math.random()) - 32.0f);  
                      
                     // Y Axis Speed And Direction
-                    particles[loop].yi = yspeed + (float) ((60 * Math.random()) - 30.0f);  
+                    particle.yi = yspeed + (float) ((60 * Math.random()) - 30.0f);  
                      
                     // Z Axis Speed And Direction
-                    particles[loop].zi = (float) ((60 * Math.random()) - 30.0f);  
-                    particles[loop].r = colors[col][0];   // Select Red From Color Table
-                    particles[loop].g = colors[col][1];   // Select Green From Color Table
-                    particles[loop].b = colors[col][2];   // Select Blue From Color Table
+                    particle.zi = (float) ((60 * Math.random()) - 30.0f);  
+                    particle.r = colors[col][0];   // Select Red From Color Table
+                    particle.g = colors[col][1];   // Select Green From Color Table
+                    particle.b = colors[col][2];   // Select Blue From Color Table
                 }
             }
         }
@@ -143,5 +155,7 @@ public class ParticleEffect
         if (delay > 25) {
             cycleColor();
         }
+        
+        Collections.sort(particles);  
     }
 }

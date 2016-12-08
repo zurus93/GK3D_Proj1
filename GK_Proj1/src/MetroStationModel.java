@@ -244,14 +244,16 @@ public class MetroStationModel implements GLEventListener {
 		
 		mGl.glActiveTexture(GL2.GL_TEXTURE0);
 		mBilboardTexture.disable(mGl);
-		
+
+		mGl.glDisable(GL.GL_DEPTH_TEST);
 		mGl.glActiveTexture(GL2.GL_TEXTURE0);
         mParticuleTexture.enable(mGl);
         mParticuleTexture.bind(mGl);
-		mParticleEffect.display(mGl, (float) mCamera.getRollAngle(), (float) mCamera.getPitchAngle());
+		mParticleEffect.display(mGl, (float) mCamera.getRollAngle(), (float) mCamera.getPitchAngle(), mCameraPos);
 		
 		mGl.glActiveTexture(GL2.GL_TEXTURE0);
 		mParticuleTexture.disable(mGl);
+		mGl.glEnable(GL.GL_DEPTH_TEST);
 	}
 
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {

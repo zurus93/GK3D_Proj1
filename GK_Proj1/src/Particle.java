@@ -1,5 +1,5 @@
 
-public class Particle
+public class Particle implements Comparable<Particle>
 {	
     boolean active;          // Active (Yes/No)
     float life;          // Particle Life
@@ -16,4 +16,12 @@ public class Particle
     float xg;          // X Gravity
     float yg;          // Y Gravity
     float zg;          // Z Gravity
+    
+    float cameraDistance;
+
+	@Override
+	public int compareTo(Particle p)
+	{
+		return (this.cameraDistance > p.cameraDistance) ? 1 : ((this.cameraDistance < p.cameraDistance) ? -1 : 0);
+	}
 }

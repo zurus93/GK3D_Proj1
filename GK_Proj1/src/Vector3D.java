@@ -17,12 +17,21 @@ public class Vector3D {
 		return new Vector3D(mX+delta.mX, mY+delta.mY, mZ+delta.mZ);
 	}
 	
+	public Vector3D substract(Vector3D vector) {
+		return new Vector3D(mX - vector.getX(), mY - vector.getY(), mZ - vector.mZ);
+	}
+	
 	public Vector3D multiply(float number) {
 		return new Vector3D(mX*number, mY*number, mZ*number);
 	}
 	
 	public Vector3D multiply(Vector3D vector) {
 		return new Vector3D(mX * vector.getX(), mY * vector.getY(), mZ * vector.getZ());
+	}
+	
+	public float distance() {
+		return (float) Math.sqrt(mX * mX + mY * mY + mZ * mZ);
+		
 	}
 	
 	public double getX() {

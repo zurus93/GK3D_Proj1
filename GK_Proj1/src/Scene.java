@@ -208,13 +208,15 @@ public class Scene {
 	public void drawTank(GL2 gl, ObjLoader board) {
 		gl.glPushMatrix();
 
-		material(gl, 1f, 1f, 1f);
+		material(gl, 0.2f, 0.4f, 0f);
 		
 		gl.glTranslated(mWorldX + 500, mPeronHeight / 2, (mWorldZ + mWorldDepth)/2-200);
 
 		board.drawModel(gl);
 
-		gl.glPopMatrix();	
+		gl.glPopMatrix();
+		
+		material(gl, 1f, 1f, 1f);
 	}
 	
 	public void drawBilboard(GL2 gl, float rotate_x, float rotate_y) {		
