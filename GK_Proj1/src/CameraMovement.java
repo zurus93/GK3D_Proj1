@@ -16,7 +16,9 @@ public class CameraMovement
 	private boolean mDPressed = false;
 	private boolean oPressed = false;
 	private boolean pPressed = false;
-
+	
+	private boolean onePressed = true;
+	
 	private double mSpeed = 10;
 
 	private double mPitchAngle = 0;
@@ -42,6 +44,10 @@ public class CameraMovement
 	
 	public double getRollAngle() {
 		return mRollAngle;
+	}
+	
+	public boolean onePressed() {
+		return onePressed;
 	}
 	
 	public Vector3D performStep (Vector3D cameraPos) {
@@ -194,6 +200,10 @@ public class CameraMovement
 				oPressed = true;
 			} else if (e.getKeyCode() == KeyEvent.VK_P) {
 				pPressed = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_1) {
+				onePressed = true;
+			} else if (e.getKeyCode() == KeyEvent.VK_2) {
+				onePressed = false;
 			}
 		}
 	}

@@ -1,11 +1,15 @@
 import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -14,6 +18,7 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -40,10 +45,14 @@ public class MetroStationModel implements GLEventListener {
 	private Vector3D mLightPos2;
 	
 	private Texture mMarmurTexture;
+	private Texture mWoodTexture;
 	private Texture mYellowStraw;
 	private Texture mWallsTexture;
 	private Texture mBilboardTexture;
 	private Texture mParticuleTexture;
+	private Texture mTankTexture;
+	//private Texture mOverlayTexture;
+	
 	
 	private ParticleEffect mParticleEffect;
 
@@ -94,9 +103,13 @@ public class MetroStationModel implements GLEventListener {
         try {
         	mWallsTexture = Cubemap.loadFromStreams(mGl, MetroStationModel.class, "walls", "jpg", false);
         	
-            InputStream stream = MetroStationModel.class.getResourceAsStream("wood.jpg");
+            InputStream stream = MetroStationModel.class.getResourceAsStream("marmur.jpg");
             TextureData data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "jpg");
             mMarmurTexture = TextureIO.newTexture(data);
+            
+            stream = MetroStationModel.class.getResourceAsStream("wood.jpg");
+            data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "jpg");
+            mWoodTexture = TextureIO.newTexture(data);
             
             stream = MetroStationModel.class.getResourceAsStream("yellow_straw.jpg");
             data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "jpg");
@@ -109,6 +122,14 @@ public class MetroStationModel implements GLEventListener {
 			stream = MetroStationModel.class.getResourceAsStream("smoke.png");
 			data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "png");
 			mParticuleTexture = TextureIO.newTexture(data);
+			
+			stream = MetroStationModel.class.getResourceAsStream("moro.jpg");
+			data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "jpg");
+			mTankTexture = TextureIO.newTexture(data);
+			
+//			stream = MetroStationModel.class.getResourceAsStream("rRectangle.png");
+//			data = TextureIO.newTextureData(GLProfile.getDefault(), stream, false, "png");
+//			mOverlayTexture = TextureIO.newTexture(data);
         }
         catch (IOException exc) {
             exc.printStackTrace();
@@ -123,6 +144,9 @@ public class MetroStationModel implements GLEventListener {
         
         mMarmurTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
         mMarmurTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        
+        mWoodTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
+        mWoodTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
                
         mYellowStraw.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_BORDER); 
         mYellowStraw.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_BORDER);
@@ -144,7 +168,15 @@ public class MetroStationModel implements GLEventListener {
         mParticuleTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST); 
         mParticuleTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
         
+        mTankTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
+        mTankTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        mTankTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+        mTankTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+               
         mParticleEffect.init();
+        
+//        mOverlayTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR); 
+//        mOverlayTexture.setTexParameteri(mGl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 	}
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -226,10 +258,12 @@ public class MetroStationModel implements GLEventListener {
 		mGl.glActiveTexture(GL2.GL_TEXTURE0);
 		mWallsTexture.disable(mGl);
 
+		Texture texture = mCamera.onePressed() ? mMarmurTexture : mWoodTexture;
+		
         // Apply texture.
         mGl.glActiveTexture(GL2.GL_TEXTURE1);
-        mMarmurTexture.enable(mGl);
-        mMarmurTexture.bind(mGl);
+        texture.enable(mGl);
+        texture.bind(mGl);
         
         mGl.glActiveTexture(GL2.GL_TEXTURE2);
         mYellowStraw.enable(mGl);
@@ -238,7 +272,7 @@ public class MetroStationModel implements GLEventListener {
 		mScene.drawPeron(mGl, drawable);
 
 		mGl.glActiveTexture(GL2.GL_TEXTURE1);
-		mMarmurTexture.disable(mGl);
+		texture.disable(mGl);
 		
 		mGl.glActiveTexture(GL2.GL_TEXTURE2);
 		mYellowStraw.disable(mGl);
@@ -246,7 +280,13 @@ public class MetroStationModel implements GLEventListener {
 		mScene.drawBench(mGl, mBench);
 		mScene.drawBulb(mGl);
 		mScene.drawPerson(mGl, mPerson);
+		
+		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+        mTankTexture.enable(mGl);
+        mTankTexture.bind(mGl);
 		mScene.drawTank(mGl, mTank);
+		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+        mTankTexture.disable(mGl);
         
         mGl.glActiveTexture(GL2.GL_TEXTURE0);
         mBilboardTexture.enable(mGl);
@@ -265,6 +305,44 @@ public class MetroStationModel implements GLEventListener {
 		mGl.glActiveTexture(GL2.GL_TEXTURE0);
 		mParticuleTexture.disable(mGl);
 		mGl.glEnable(GL.GL_DEPTH_TEST);
+
+//		mGl.glDisable(GL2.GL_FOG);
+//		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+//        mOverlayTexture.enable(mGl);
+//        mOverlayTexture.bind(mGl);
+//		drawOverlay();
+//		mGl.glActiveTexture(GL2.GL_TEXTURE0);
+//		mOverlayTexture.disable(mGl);
+//		mGl.glEnable(GL2.GL_FOG);
+	}
+	
+	public void drawOverlay() {
+		mGl.glMatrixMode(GL2.GL_PROJECTION);
+		mGl.glPushMatrix();
+		mGl.glLoadIdentity();
+		mGl.glOrtho(0.0, mCanvas.getWidth(), mCanvas.getHeight(), 0.0, -1.0, 10.0);
+		mGl.glMatrixMode(GL2.GL_MODELVIEW);
+		mGl.glLoadIdentity();
+		mGl.glDisable(GL2.GL_CULL_FACE);
+
+		mGl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
+
+		mGl.glBegin(GL2.GL_POLYGON);
+		    mGl.glColor3f(1.0f, 1.0f, 0.0f);
+		    mGl.glTexCoord2f(0, 0);
+		    mGl.glVertex2f(0.0f, 0.0f);
+		    mGl.glTexCoord2f(1, 0);
+		    mGl.glVertex2f(500.0f, 0.0f);
+		    mGl.glTexCoord2f(1, 1);
+		    mGl.glVertex2f(500.0f, 350.0f);
+		    mGl.glTexCoord2f(0, 1);
+		    mGl.glVertex2f(0.0f, 350.0f);
+		mGl.glEnd();
+
+		// Making sure we can render 3d again
+		mGl.glMatrixMode(GL2.GL_PROJECTION);
+		mGl.glPopMatrix();
+		mGl.glMatrixMode(GL2.GL_MODELVIEW);
 	}
 
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
